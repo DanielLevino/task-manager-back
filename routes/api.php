@@ -10,4 +10,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/auth/me', [AuthController::class, 'me']);
 
     Route::apiResource('tasks', TaskController::class);
+    Route::post('tasks/{task}/assign', [TaskController::class, 'assign']);
+
 });
