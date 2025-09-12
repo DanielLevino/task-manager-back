@@ -18,10 +18,11 @@ class TeamController extends Controller
         $user = $request->user();
 
         $teams = Team::query()
-            ->whereHas('memberships', function ($q) use ($user) {
-                $q->where('user_id', $user->id);
+            ->join('team_memberships as tm', function ($j) use ($user) {
+                $j->on('tm.team_id', 'teams.id')
+                    ->where('tm.user_id', $user->id);
             })
-            ->with('memberships')
+            ->select('teams.id', 'teams.name', 'tm.role as member_role')
             ->get();
 
         return response()->json($teams);
@@ -42,7 +43,7 @@ class TeamController extends Controller
             $team = Team::create([
                 'id'         => (string) Str::uuid(),
                 'name'       => $data['name'],
-                'icon'       => $data['icon'] ?? null,
+                //'icon'       => $data['icon'] ?? null,
                 'created_by' => $user->id,
             ]);
 
@@ -50,7 +51,7 @@ class TeamController extends Controller
                 'id'      => (string) Str::uuid(),
                 'team_id' => $team->id,
                 'user_id' => $user->id,
-                'role'    => 'creator',
+                'role'    => 'owner',
             ]);
 
             return response()->json([
@@ -67,12 +68,60 @@ class TeamController extends Controller
     {
         $user = $request->user();
 
-        // garante que o user participa da equipe
         if (!$team->memberships()->where('user_id', $user->id)->exists()) {
-            return response()->json(['error' => 'Não autorizado'], 403);
+            return response()->json([
+                "id"=>$team->id, 
+                "name"=>$team->name,
+                "member"=> false,
+                "approval"=>false,
+            ],203);
         }
 
-        return response()->json($team->load('memberships'));
+        $team->load([
+            'memberships' => function ($q) {
+                $q->select('id', 'team_id', 'user_id', 'role');
+            },
+            'memberships.user:id,name,email',
+        ]);
+
+        $myRole = optional(
+            $team->memberships->firstWhere('user_id', $user->id)
+        )->role;
+
+        if($myRole=="pending"){
+            return response()->json([
+                "id"=>$team->id, 
+                "name"=>$team->name,
+                "member"=> false,
+                "approval"=>"pending",
+            ],203);
+        }
+
+        if($myRole=="rejected"){
+            return response()->json([
+                "id"=>$team->id, 
+                "name"=>$team->name,
+                "member"=> false,
+                "approval"=>"rejected",
+            ],203);
+        }
+
+        $response = [
+            'id'        => $team->id,
+            'name'      => $team->name,
+            'member'    => true,
+            'my_role'   => $myRole,
+            'memberships' => $team->memberships->map(function ($membership) {
+                return [
+                    'id'    => $membership->user->id,
+                    'name'  => $membership->user->name,
+                    'email' => $membership->user->email,
+                    'role'  => $membership->role,
+                ];
+            })->values(),
+        ];
+
+        return response()->json($response, 200);
     }
 
     /**
@@ -108,7 +157,6 @@ class TeamController extends Controller
     {
         $user = $request->user();
 
-        // só o creator pode deletar
         $membership = $team->memberships()->where('user_id', $user->id)->first();
         if (!$membership || $membership->role !== 'creator') {
             return response()->json(['error' => 'Não autorizado'], 403);

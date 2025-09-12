@@ -49,4 +49,11 @@ class User extends Authenticatable
     {
         return $this->hasMany(TeamMembership::class);
     }
+    public function teams()
+    {
+        return $this->belongsToMany(\App\Models\Team::class, 'team_memberships')
+            ->select('teams.id', 'teams.name')
+            ->get()
+            ->makeHidden('pivot');
+    }
 }

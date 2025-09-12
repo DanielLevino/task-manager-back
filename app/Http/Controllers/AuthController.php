@@ -6,12 +6,13 @@ use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
+use App\Models\Team;
 
 class AuthController extends Controller
 {
-    public function register(Request $req)
+    public function register(Request $request)
     {
-        $data = $req->validate([
+        $data = $request->validate([
             'name'     => 'required|string|min:2',
             'email'    => 'required|email|unique:users,email',
             'password' => 'required|string|min:6',
@@ -25,16 +26,16 @@ class AuthController extends Controller
 
         // faz login logo após registro
         Auth::login($user);
-        $req->session()->regenerate();
+        $request->session()->regenerate();
 
         return response()->json(['user' => $user], 201);
     }
 
-    public function login(Request $req)
+    public function login(Request $request)
     {
-        $credentials = $req->validate([
-            'email'    => ['required','email'],
-            'password' => ['required','string'],
+        $credentials = $request->validate([
+            'email'    => ['required', 'email'],
+            'password' => ['required', 'string'],
         ]);
 
         // IMPORTANTE: antes, o front deve chamar GET /sanctum/csrf-cookie
@@ -42,21 +43,30 @@ class AuthController extends Controller
             return response()->json(['message' => 'Credenciais inválidas'], 422);
         }
 
-        $req->session()->regenerate();
+        $request->session()->regenerate();
         return response()->json(['user' => Auth::user()]);
     }
 
-    public function logout(Request $req)
+    public function logout(Request $request)
     {
         Auth::guard('web')->logout();
-        $req->session()->invalidate();
-        $req->session()->regenerateToken();
+        $request->session()->invalidate();
+        $request->session()->regenerateToken();
 
         return response()->json(['message' => 'Logout realizado']);
     }
 
-    public function me(Request $req)
+    public function me(Request $request)
     {
-        return response()->json($req->user());
+        $authUser = $request->user();
+        $teams = $authUser->teams();
+        $response = [
+            "id"=>$authUser->id,
+            "name"=>$authUser->name,
+            "email"=>$authUser->email,
+            "teams"=>$teams
+        ];
+
+        return response()->json($response);
     }
 }

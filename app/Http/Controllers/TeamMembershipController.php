@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Models\TeamMembership;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class TeamMembershipController extends Controller
 {
@@ -21,7 +22,17 @@ class TeamMembershipController extends Controller
      */
     public function store(Request $request)
     {
-        //
+        $membership = TeamMembership::create([
+            'id'=>(string) Str::uuid(),
+            'team_id'=>$request->input('teamId'),
+            'user_id'=>$request->input('memberId'),
+            'role'=> 'pending'
+        ]);
+
+        return response()->json([
+            'message'    => 'Join request created and is pending approval.',
+            'membership' => $membership
+        ], 201);
     }
 
     /**
