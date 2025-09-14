@@ -70,6 +70,7 @@ class TaskController extends Controller
     {
         $data = $req->validate([
             'title'       => 'required|string|max:255',
+            'team_id'     => 'nullable|string',
             'description' => 'nullable|string',
             'due_date'    => 'nullable|date',
             'status'      => ['nullable', Rule::in(['todo','doing','done'])],
@@ -93,7 +94,7 @@ class TaskController extends Controller
     public function show(Task $task)
     {
         // se quiser, futuras regras de acesso entram aqui
-        return $task->load(['creator:id,name', 'assignee:id,name']);
+        return $task->load(['creator:id,name', 'assignee:id,name', 'team:id,name']);
     }
 
     /**
@@ -105,6 +106,7 @@ class TaskController extends Controller
 
         $data = $req->validate([
             'title'       => 'sometimes|required|string|max:255',
+            'team_id'     => 'nullable|string',
             'description' => 'nullable|string',
             'due_date'    => 'nullable|date',
             'status'      => ['nullable', Rule::in(['todo','doing','done'])],
@@ -114,7 +116,7 @@ class TaskController extends Controller
 
         $task->update($data);
 
-        return $task->load(['creator:id,name', 'assignee:id,name']);
+        return $task->load(['creator:id,name', 'assignee:id,name', 'team:id,name']);
     }
 
     /**

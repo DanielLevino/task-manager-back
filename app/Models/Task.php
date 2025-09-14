@@ -10,7 +10,7 @@ class Task extends Model
     use HasFactory;
 
     protected $fillable = [
-        'title','description','due_date','status','priority','creator_id','assignee_id'
+        'title','team_id','description','due_date','status','priority','creator_id','assignee_id'
     ];
 
     public function scopeVisibleTo($query, User $user)
@@ -24,4 +24,5 @@ class Task extends Model
 
     public function creator() { return $this->belongsTo(User::class, 'creator_id'); }
     public function assignee() { return $this->belongsTo(User::class, 'assignee_id'); }
+    public function team() { return $this->belongsTo(Team::class, 'team_id');}
 }

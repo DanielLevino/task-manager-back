@@ -43,7 +43,6 @@ class TeamController extends Controller
             $team = Team::create([
                 'id'         => (string) Str::uuid(),
                 'name'       => $data['name'],
-                //'icon'       => $data['icon'] ?? null,
                 'created_by' => $user->id,
             ]);
 
