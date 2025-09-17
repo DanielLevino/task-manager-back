@@ -9,4 +9,4 @@ Route::middleware('guest')->group(function () {
 });
 
 Route::post('/logout', [AuthController::class, 'logout'])
-    ->middleware('auth'); // usa guard 'web' (sessão)
+    ->middleware('auth');

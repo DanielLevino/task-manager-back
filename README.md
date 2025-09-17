@@ -1,61 +1,199 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Gerenciador de Tarefas Backend - (Laravel 12 + Redis + SQLite)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API RESTful construída em Laravel 12, responsável por gerenciar autenticação, usuários, equipes e tarefas.
 
-## About Laravel
+**Ele fornece os serviços principais do sistema, incluindo:**
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+- [x] 🔐 Autenticação via Laravel Sanctum (registro, login, logout e perfil).
+--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
+- [x] 👥 Gestão de equipes e membros (criação, convites, aprovação/rejeição, papéis de acesso).
+--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
+- [x] ✅ Gerenciamento de tarefas com CRUD completo, filtros, paginação e visualização em Kanban.
+--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
+- [x] 📬 Notificações por e-mail processadas em filas Redis (tarefas criadas ou atribuídas).
+--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
+- [x] 📅 Serviço inteligente de feriados integrado à API da Invertexto, com cache em Redis, para alertar usuários quando a data de vencimento cair em um feriado.
+--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
+- [ ] ⚡ Integração em tempo real (pronta para WebSockets/Reverb) para atualização instantânea de tarefas e notificações. ^(^^em^ ^desencolvimento^^)^
+--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
+- [ ] 🛠️ Infraestrutura escalável com Redis para cache, filas e suporte opcional ao Laravel Horizon para monitoramento. ^(^^em^ ^desencolvimento^^)^
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+---
+## ============== ⚙️ Stack ===================
+- PHP 8.2+
+- Laravel 12
+- SQLite (dev)
+- Redis (cache + queues)
+- Sanctum (SPA auth)
+- Mail (SMTP/Mailtrap)
+- (Opcional) Horizon (dashboard de filas)
+---
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+## =========== 🚀 Subir localmente ===========
+### 1) Dependências
+- ##### dentro de /backend
+```
+composer install
+cp .env.example .env
+```
+- ##### gerar app key
+```
+php artisan key:generate
+```
 
-## Learning Laravel
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 2) Banco (SQLite)
+- ##### cria o arquivo do banco
+```
+touch database/database.sqlite
+```
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+### 3) Variáveis de ambiente
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+- ##### No .env:
 
-## Laravel Sponsors
+```
+# FrontEnd and BackEnd Comunication
+APP_URL=http://localhost:8000
+FRONTEND_URL=http://localhost:9000
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+# Auth SPA (Sanctum)
+SESSION_DRIVER=cookie
+SESSION_DOMAIN=localhost
+SANCTUM_STATEFUL_DOMAINS=localhost:9000
+SESSION_SECURE_COOKIE=false
 
-### Premium Partners
+# Banco
+DB_CONNECTION=sqlite
+DB_DATABASE=/abs/path/para/database/database.sqlite
 
-- **[Vehikl](https://vehikl.com)**
-- **[Tighten Co.](https://tighten.co)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Redberry](https://redberry.international/laravel-development)**
-- **[Active Logic](https://activelogic.com)**
+# Cache/Queue
+CACHE_DRIVER=redis
+QUEUE_CONNECTION=redis
 
-## Contributing
+# Mail (Mailtrap/Sua conta SMTP)
+MAIL_MAILER=smtp
+MAIL_HOST=smtp.mailtrap.io
+MAIL_PORT=2525
+MAIL_USERNAME=SEU_USER
+MAIL_PASSWORD=SEU_PASS
+MAIL_ENCRYPTION=null
+MAIL_FROM_ADDRESS=no-reply@localhost
+MAIL_FROM_NAME="Tasks App"
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+# Feriados (Invertexto)
+INVERTEXTO_API_KEY=SEU_TOKEN
+HOLIDAY_CACHE_TTL=43200  # 12h
+HOLIDAY_DEFAULT_UF=PE
+```
 
-## Code of Conduct
+### 4) Migrations
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+```
+php artisan migrate
+```
+### 6) Servidores
+- #### app HTTP
+```
+php artisan serve
+```
 
-## Security Vulnerabilities
+- #### filas (emails etc.)
+```
+php artisan queue:work --queue=emails,default
+```
+ou
+```
+php artisan queue:work
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+- [ ] (Opcional) Horizon: ^(^^em^ ^desencolvimento^^)^
+```
+composer require laravel/horizon
+php artisan vendor:publish --provider="Laravel\Horizon\HorizonServiceProvider"
+php artisan horizon
+```
+---
+## =========== 🔑 Autenticação =========== 
 
-## License
+SPA com Sanctum (cookies).
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+O frontend deve chamar GET /sanctum/csrf-cookie antes de POST /login//register.
+
+## =============🔌 Endpoints principais ===========
+```
+ ______________________________________________________
+|    METODO   |          ROTA         |     ACESSO     |
+|-------------|-----------------------|----------------|
+|     POST    |      /api/register    |    (guest)     |
+|     POST    |      /api/login       |    (guest)     |
+|     POST    |      /api/logout      |   (auth:web)   |
+|             |                       |                |
+|     GET     |      /api/auth/me     | (auth:sanctum) |
+|             |                       |                |
+| apiResource |       /api/tasks      | (auth:sanctum) |
+| apiResource |       /api/teams      | (auth:sanctum) |
+| apiResource | /api/team-memberships | (auth:sanctum) |
+|             |                       |                |
+|     GET     | /api/holidays/check   | (auth:sanctum) |
+|-------------|-----------------------|----------------|
+```
+
+## =========== 📬 Filas + E-mails =========== 
+
+- _**Jobs:**_
+
+SendTaskCreatedMail
+
+SendTaskAssignedMail
+
+- _**Disparo:**_
+
+Em TaskController@store (criação)
+
+Em TaskController@assign ou update quando assignee_id muda.
+
+- _**Worker:**_
+```
+php artisan queue:work --queue=emails,default
+```
+
+## ==== 🎉 Feriados (Service + Cache Redis) ====
+
+app/Services/HolidayService.php
+
+> Usa GET https://api.invertexto.com/v1/holidays/{year}?token=...&state=UF
+
+Cache {year}:{UF} (TTL configurável).
+
+**GET** `/api/holidays/check`
+
+Retorna `Json`: 
+```
+{ 
+    is_holiday, 
+    name, 
+    date, 
+    uf, 
+    year 
+}
+```
+
+
+## =========== 🧪 Testes rápidos ===========
+php artisan tinker
+```
+>>> app(\App\Services\HolidayService::class)->check('2025-09-07', 'PE')
+
+Response: --->
+{
+    is_holiday: true,
+    name: "Dia da Independência",
+    date: "2025-09-07",
+    uf: "PE",
+    year: "2025"
+}
+```
+
+🐞 Troubleshooting
+

@@ -24,11 +24,10 @@ class AuthController extends Controller
             'password' => Hash::make($data['password']),
         ]);
 
-        // faz login logo após registro
         Auth::login($user);
         $request->session()->regenerate();
 
-        return response()->json(['user' => $user], 201);
+        return response()->json(['success' => true], 201);
     }
 
     public function login(Request $request)
@@ -38,9 +37,11 @@ class AuthController extends Controller
             'password' => ['required', 'string'],
         ]);
 
-        // IMPORTANTE: antes, o front deve chamar GET /sanctum/csrf-cookie
         if (! Auth::attempt($credentials, true)) {
-            return response()->json(['message' => 'Credenciais inválidas'], 422);
+            return response()->json([
+                'success' => false,
+                'message' => 'Invalid credentials'
+            ], 401);
         }
 
         $request->session()->regenerate();

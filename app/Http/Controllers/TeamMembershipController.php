@@ -6,6 +6,8 @@ use App\Models\TeamMembership;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
+use Illuminate\Validation\Rule;
+use App\Models\Team;
 
 class TeamMembershipController extends Controller
 {
@@ -23,15 +25,15 @@ class TeamMembershipController extends Controller
     public function store(Request $request)
     {
         $membership = TeamMembership::create([
-            'id'=>(string) Str::uuid(),
-            'team_id'=>$request->input('teamId'),
-            'user_id'=>$request->input('memberId'),
-            'role'=> 'pending'
+            'id' => (string) Str::uuid(),
+            'team_id' => $request->input('teamId'),
+            'user_id' => $request->input('memberId'),
+            'role' => 'pending'
         ]);
 
         return response()->json([
+            'success' => true,
             'message'    => 'Join request created and is pending approval.',
-            'membership' => $membership
         ], 201);
     }
 
@@ -48,7 +50,20 @@ class TeamMembershipController extends Controller
      */
     public function update(Request $request, TeamMembership $teamMembership)
     {
-        //
+
+        $validated = $request->validate([
+            'teamId' => ['required', 'uuid', Rule::exists('teams', 'id')],
+            'role'   => ['required', Rule::in(['admin', 'member', 'rejected', 'pending'])],
+        ]);
+
+        $teamMembership->role = $validated['role'];
+        $teamMembership->save();
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Membership atualizado com sucesso.',
+            'data'    => $teamMembership,
+        ], 200);
     }
 
     /**

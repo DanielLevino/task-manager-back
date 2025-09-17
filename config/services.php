@@ -35,4 +35,9 @@ return [
         ],
     ],
 
+    'invertexto' => [
+        'key' => env('INVERTEXTO_API_KEY'),
+        'ttl' => env('HOLIDAY_CACHE_TTL', 43200),
+    ],
+
 ];

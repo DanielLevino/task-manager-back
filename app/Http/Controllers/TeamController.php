@@ -112,10 +112,11 @@ class TeamController extends Controller
             'my_role'   => $myRole,
             'memberships' => $team->memberships->map(function ($membership) {
                 return [
-                    'id'    => $membership->user->id,
-                    'name'  => $membership->user->name,
+                    'id' => $membership->user->id,
+                    'name' => $membership->user->name,
                     'email' => $membership->user->email,
-                    'role'  => $membership->role,
+                    'role' => $membership->role,
+                    'teamMembershipId' => $membership->id,
                 ];
             })->values(),
         ];
@@ -133,20 +134,17 @@ class TeamController extends Controller
         // só admin/creator pode atualizar
         $membership = $team->memberships()->where('user_id', $user->id)->first();
         if (!$membership || !in_array($membership->role, ['admin', 'creator'])) {
-            return response()->json(['error' => 'Não autorizado'], 403);
+            return response()->json(['success'=>false], 403);
         }
 
         $data = $request->validate([
             'name' => ['string', 'max:255'],
-            'icon' => ['nullable', 'string', 'max:100'],
+            //'icon' => ['nullable', 'string', 'max:100'],
         ]);
 
         $team->update($data);
 
-        return response()->json([
-            'message' => 'Equipe atualizada',
-            'data'    => $team,
-        ]);
+        return response()->json(['success'=>true]);
     }
 
     /**
@@ -158,11 +156,11 @@ class TeamController extends Controller
 
         $membership = $team->memberships()->where('user_id', $user->id)->first();
         if (!$membership || $membership->role !== 'creator') {
-            return response()->json(['error' => 'Não autorizado'], 403);
+            return response()->json(['success'=>false], 403);
         }
 
         $team->delete();
 
-        return response()->json(['message' => 'Equipe deletada']);
+        return response()->json(['success'=>true]);
     }
 }

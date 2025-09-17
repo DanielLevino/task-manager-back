@@ -82,10 +82,18 @@ class TaskController extends Controller
 
         $task = Task::create($data);
 
-        return response()->json(
-            $task->load(['creator:id,name', 'assignee:id,name']),
-            201
-        );
+        dispatch(new \App\Jobs\SendTaskCreatedMail($task))->onQueue('emails');
+
+        if (!empty($task->assignee_id) && (int)$task->assignee_id !== (int)$task->creator_id) {
+            dispatch(
+                new \App\Jobs\SendTaskAssignedMail($task->load('assignee','creator'))
+            )->onQueue('emails');
+        }
+
+        $uf = strtoupper(config('app.holiday_uf', env('HOLIDAY_DEFAULT_UF','PE')));
+        $holiday = app(\App\Services\HolidayService::class)->check($task->due_date, $uf);
+
+        return response()->json(['success' => true], 201);
     }
 
     /**
@@ -93,7 +101,6 @@ class TaskController extends Controller
      */
     public function show(Task $task)
     {
-        // se quiser, futuras regras de acesso entram aqui
         return $task->load(['creator:id,name', 'assignee:id,name', 'team:id,name']);
     }
 
@@ -114,10 +121,22 @@ class TaskController extends Controller
             'assignee_id' => 'nullable|exists:users,id',
         ]);
 
+        $oldAssigneeId = $task->getOriginal('assignee_id');
+
         $task->update($data);
 
-        return $task->load(['creator:id,name', 'assignee:id,name', 'team:id,name']);
+        if (array_key_exists('assignee_id', $data) && (int)$data['assignee_id'] !== (int)$oldAssigneeId) {
+            if (!empty($task->assignee_id) && (int)$task->assignee_id !== (int)$task->creator_id) {
+                dispatch(new \App\Jobs\SendTaskAssignedMail($task->load('assignee','creator')))->onQueue('emails');
+            }
+        }
+
+        $uf = strtoupper(config('app.holiday_uf', env('HOLIDAY_DEFAULT_UF','PE')));
+        $holiday = app(\App\Services\HolidayService::class)->check($task->due_date, $uf);
+
+        return response()->json(['success'=>true], 200);
     }
+
 
     /**
      * DELETE /api/tasks/{task}
@@ -142,6 +161,7 @@ class TaskController extends Controller
         ]);
 
         $task->update(['assignee_id' => $data['assignee_id']]);
+        dispatch(new \App\Jobs\SendTaskAssignedMail($task->load('assignee','creator')))->onQueue('emails');
 
         return $task->load(['creator:id,name', 'assignee:id,name']);
     }
