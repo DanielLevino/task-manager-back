@@ -5,17 +5,11 @@ API RESTful construída em Laravel 12, responsável por gerenciar autenticação
 **Ele fornece os serviços principais do sistema, incluindo:**
 
 - [x] 🔐 Autenticação via Laravel Sanctum (registro, login, logout e perfil).
---^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
 - [x] 👥 Gestão de equipes e membros (criação, convites, aprovação/rejeição, papéis de acesso).
---^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
 - [x] ✅ Gerenciamento de tarefas com CRUD completo, filtros, paginação e visualização em Kanban.
---^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
 - [x] 📬 Notificações por e-mail processadas em filas Redis (tarefas criadas ou atribuídas).
---^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
 - [x] 📅 Serviço inteligente de feriados integrado à API da Invertexto, com cache em Redis, para alertar usuários quando a data de vencimento cair em um feriado.
---^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
 - [ ] ⚡ Integração em tempo real (pronta para WebSockets/Reverb) para atualização instantânea de tarefas e notificações. ^(^^em^ ^desencolvimento^^)^
---^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^--^
 - [ ] 🛠️ Infraestrutura escalável com Redis para cache, filas e suporte opcional ao Laravel Horizon para monitoramento. ^(^^em^ ^desencolvimento^^)^
 
 ---
@@ -70,6 +64,12 @@ DB_DATABASE=/abs/path/para/database/database.sqlite
 # Cache/Queue
 CACHE_DRIVER=redis
 QUEUE_CONNECTION=redis
+
+# Redis
+REDIS_CLIENT=predis
+REDIS_HOST=127.0.0.1
+REDIS_PASSWORD=null
+REDIS_PORT=6379
 
 # Mail (Mailtrap/Sua conta SMTP)
 MAIL_MAILER=smtp
@@ -195,5 +195,13 @@ Response: --->
 }
 ```
 
-🐞 Troubleshooting
+## ========== 🐞 Troubleshooting =========
+```
+# ERRO
+"message": "Call to a member function connect() on null",
+"exception": "Error",
+"file": "...\\Redis\\RedisManager.php",
+"line": 111,
+```
+No `.env` verifique se REDIS_CLIENT=predis caso contrário, modifique.
 
