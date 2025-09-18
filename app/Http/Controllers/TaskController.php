@@ -90,8 +90,10 @@ class TaskController extends Controller
             )->onQueue('emails');
         }
 
-        $uf = strtoupper(config('app.holiday_uf', env('HOLIDAY_DEFAULT_UF','PE')));
-        $holiday = app(\App\Services\HolidayService::class)->check($task->due_date, $uf);
+        if ($task->due_date) {
+            $uf = strtoupper(config('app.holiday_uf', env('HOLIDAY_DEFAULT_UF','PE')));
+            $holiday = app(\App\Services\HolidayService::class)->check($task->due_date, $uf);
+        }
 
         return response()->json(['success' => true], 201);
     }
@@ -131,8 +133,10 @@ class TaskController extends Controller
             }
         }
 
-        $uf = strtoupper(config('app.holiday_uf', env('HOLIDAY_DEFAULT_UF','PE')));
-        $holiday = app(\App\Services\HolidayService::class)->check($task->due_date, $uf);
+        if ($task->due_date) {
+            $uf = strtoupper(config('app.holiday_uf', env('HOLIDAY_DEFAULT_UF','PE')));
+            $holiday = app(\App\Services\HolidayService::class)->check($task->due_date, $uf);
+        }
 
         return response()->json(['success'=>true], 200);
     }
